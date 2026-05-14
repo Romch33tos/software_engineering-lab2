@@ -125,3 +125,51 @@ hr { margin: 0.75rem 0; }
     padding: 0.5rem 0.75rem;
     font-size: 0.85rem;
 }
+
+.param-block {
+    margin-bottom: 1.25rem;
+}
+
+.param-block:last-child {
+    margin-bottom: 0;
+}
+
+.validation-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    margin-top: 0.35rem;
+    min-height: 1.75rem;
+}
+
+.factors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.85rem;
+    margin-top: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.factor-card {
+    background-color: #f8fafc;
+    border-radius: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.1s ease;
+}
+
+.factor-card label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.drivers-scroll {
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    margin-top: 0.5rem;
+}
