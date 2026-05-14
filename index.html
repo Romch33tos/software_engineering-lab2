@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Калькулятор COCOMO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 antialiased p-4 md:p-6">
+
+<div class="max-w-7xl mx-auto">
+    <div class="mb-6 text-center md:text-left">
+        <h1 class="text-3xl md:text-4xl font-medium tracking-tight text-slate-800 border-l-8 border-blue-600 pl-4 inline-block">COCOMO и COCOMO II</h1>
+        <p class="text-slate-500 mt-2 ml-2 text-sm">Калькулятор трудоёмкости (человеко-месяцев) и времени разработки (календарных месяцев)</p>
+    </div>
+
+    <div class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 pb-2">
+        <button data-tab="basic" class="tab-btn px-5 py-2 rounded-full text-sm font-medium transition-all tab-active">Базовая модель COCOMO</button>
+        <button data-tab="intermediate" class="tab-btn px-5 py-2 rounded-full text-sm font-medium transition-all tab-inactive">Промежуточная модель COCOMO</button>
+        <button data-tab="early" class="tab-btn px-5 py-2 rounded-full text-sm font-medium transition-all tab-inactive">COCOMO II (Предварительная оценка)</button>
+        <button data-tab="post" class="tab-btn px-5 py-2 rounded-full text-sm font-medium transition-all tab-inactive">COCOMO II (Детальная оценка)</button>
+    </div>
+
+    <div id="panel-basic" class="tab-panel">
+        <div class="bg-white rounded-2xl shadow-lg p-5 md:p-6 border border-slate-100">
+            <h2 class="text-xl font-medium text-slate-800 mb-5">Базовая модель COCOMO (Basic)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="param-block">
+                    <label class="param-label">Объем кода (SIZE)</label>
+                    <div class="size-input-group">
+                        <input type="number" id="basic-size-value" value="25" step="any" class="border border-slate-300 rounded-lg p-2 w-full">
+                        <select id="basic-size-unit" class="border rounded-lg bg-white p-2">
+                            <option value="ksloc">Тыс. строк (KSLOC)</option>
+                            <option value="sloc" selected>Строк кода (SLOC)</option>
+                        </select>
+                    </div>
+                    <div class="validation-row">
+                        <div id="basic-size-hint" class="hint-text">💡 Рекомендуемый диапазон: 2–100 KSLOC (2000–100000 SLOC)</div>
+                        <div id="basic-size-error" class="error-text hidden"></div>
+                    </div>
+                </div>
+                <div class="param-block">
+                    <label class="param-label">Тип проекта</label>
+                    <select id="basic-type" class="param-select">
+                        <option value="organic">Распространённый (organic)</option>
+                        <option value="semidetached">Полунезависимый (semidetached)</option>
+                        <option value="embedded">Встроенный (embedded)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="result-card">
+                    <div class="result-label">Трудоемкость (PM)</div>
+                    <div class="result-value text-blue-700" id="basic-pm-value">—</div>
+                    <div class="result-sub">человеко-месяцев</div>
+                    <div class="calculation-detail" id="basic-pm-detail">PM = a × (SIZE)^b</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Время разработки (TM)</div>
+                    <div class="result-value text-emerald-700" id="basic-tm-value">—</div>
+                    <div class="result-sub">календарных месяцев</div>
+                    <div class="calculation-detail" id="basic-tm-detail">TM = c × (PM)^d</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-intermediate" class="tab-panel hidden">
+        <div class="bg-white rounded-2xl shadow-lg p-5 md:p-6">
+            <h2 class="text-xl font-medium text-slate-800 mb-5">Промежуточная модель COCOMO</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="param-block">
+                    <label class="param-label">Объем кода (SIZE)</label>
+                    <div class="size-input-group">
+                        <input type="number" id="inter-size-value" value="25" class="border rounded-lg p-2 w-full">
+                        <select id="inter-size-unit" class="border rounded-lg bg-white p-2">
+                            <option value="ksloc">Тыс. строк (KSLOC)</option>
+                            <option value="sloc" selected>Строк кода (SLOC)</option>
+                        </select>
+                    </div>
+                    <div class="validation-row">
+                        <div id="inter-size-hint" class="hint-text">💡 Рекомендуемый диапазон: 2–100 KSLOC (2000–100000 SLOC)</div>
+                        <div id="inter-size-error" class="error-text hidden"></div>
+                    </div>
+                </div>
+                <div class="param-block">
+                    <label class="param-label">Тип проекта</label>
+                    <select id="inter-type" class="param-select">
+                        <option value="organic">Распространённый (organic)</option>
+                        <option value="semidetached">Полунезависимый (semidetached)</option>
+                        <option value="embedded">Встроенный (embedded)</option>
+                    </select>
+                </div>
+            </div>
+            <hr class="my-5">
+            <div>
+                <h3 class="font-medium text-slate-700 mb-3">Атрибуты стоимости (15 факторов)</h3>
+                <div id="inter-cost-drivers" class="drivers-scroll factors-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));"></div>
+            </div>
+            <div class="mt-6 grid md:grid-cols-3 gap-5">
+                <div class="result-card"><div class="result-label">EAF (произведение множителей)</div><div class="text-xl font-semibold text-indigo-700" id="inter-eaf">1.00</div><div class="calculation-detail text-sm mt-2" id="inter-eaf-detail"></div></div>
+                <div class="result-card"><div class="result-label">PM (человеко-месяцев)</div><div class="text-xl font-semibold text-blue-700" id="inter-pm">—</div><div class="calculation-detail text-sm mt-2" id="inter-pm-detail"></div></div>
+                <div class="result-card"><div class="result-label">TM (календарных месяцев)</div><div class="text-xl font-semibold text-emerald-700" id="inter-tm">—</div><div class="calculation-detail text-sm mt-2" id="inter-tm-detail"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-early" class="tab-panel hidden">
+        <div class="bg-white rounded-2xl shadow-lg p-5 md:p-6">
+            <h2 class="text-xl font-medium text-slate-800 mb-5">COCOMO II — Предварительная оценка (Early Design)</h2>
+            <div class="param-block">
+                <label class="param-label">Объем кода (тыс. строк, KSLOC)</label>
+                <input type="number" id="early-size" value="25" step="any" class="border border-slate-300 rounded-lg p-2 w-full md:w-2/3">
+                <div class="validation-row">
+                    <div id="early-size-hint" class="hint-text">💡 Рекомендуемый диапазон: 2–100 KSLOC</div>
+                    <div id="early-size-error" class="error-text hidden"></div>
+                </div>
+            </div>
+            <hr class="my-5">
+            <div class="param-block">
+                <h3 class="font-medium text-slate-800 mb-2">Факторы масштаба (Scale Factors)</h3>
+                <div id="early-scale-factors" class="factors-grid"></div>
+            </div>
+            <div class="param-block">
+                <h3 class="font-medium text-slate-800 mb-2 mt-2">Множители трудоемкости (7 факторов)</h3>
+                <div id="early-effort-multipliers" class="factors-grid"></div>
+            </div>
+            <div class="mt-6 grid md:grid-cols-2 gap-5">
+                <div class="result-card"><div class="result-label">Экспонента E = 0.91 + 0.01 × ΣSF</div><div class="text-lg font-semibold" id="early-exp">—</div><div class="calculation-detail text-sm" id="early-exp-detail"></div></div>
+                <div class="result-card"><div class="result-label">EAF (произведение EM)</div><div class="text-lg font-semibold text-indigo-700" id="early-eaf">1.00</div><div class="calculation-detail text-sm" id="early-eaf-detail"></div></div>
+                <div class="result-card"><div class="result-label">PM (человеко-месяцев)</div><div class="text-xl font-semibold text-blue-700" id="early-pm">—</div><div class="calculation-detail text-sm" id="early-pm-detail"></div></div>
+                <div class="result-card"><div class="result-label">TM (календарных месяцев)</div><div class="text-xl font-semibold text-emerald-700" id="early-tm">—</div><div class="calculation-detail text-sm" id="early-tm-detail"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel-post" class="tab-panel hidden">
+        <div class="bg-white rounded-2xl shadow-lg p-5 md:p-6">
+            <h2 class="text-xl font-medium text-slate-800 mb-5">COCOMO II — Детальная оценка (Post Architecture)</h2>
+            <div class="param-block">
+                <label class="param-label">Объем кода (тыс. строк, KSLOC)</label>
+                <input type="number" id="post-size" value="25" step="any" class="border border-slate-300 rounded-lg p-2 w-full md:w-2/3">
+                <div class="validation-row">
+                    <div id="post-size-hint" class="hint-text">💡 Рекомендуемый диапазон: 2–100 KSLOC</div>
+                    <div id="post-size-error" class="error-text hidden"></div>
+                </div>
+            </div>
+            <hr class="my-5">
+            <div class="param-block">
+                <h3 class="font-medium text-slate-800 mb-2">Факторы масштаба (Scale Factors)</h3>
+                <div id="post-scale-factors" class="factors-grid"></div>
+            </div>
+            <div class="param-block">
+                <h3 class="font-medium text-slate-800 mb-2 mt-2">Множители трудоемкости (17 факторов)</h3>
+                <div id="post-effort-multipliers" class="drivers-scroll factors-grid" style="max-height: 480px;"></div>
+            </div>
+            <div class="mt-6 grid md:grid-cols-2 gap-5">
+                <div class="result-card"><div class="result-label">Экспонента E = 0.91 + 0.01 × ΣSF</div><div class="text-lg font-semibold" id="post-exp">—</div><div class="calculation-detail text-sm" id="post-exp-detail"></div></div>
+                <div class="result-card"><div class="result-label">EAF (произведение EM)</div><div class="text-lg font-semibold text-indigo-700" id="post-eaf">1.00</div><div class="calculation-detail text-sm" id="post-eaf-detail"></div></div>
+                <div class="result-card"><div class="result-label">PM (человеко-месяцев)</div><div class="text-xl font-semibold text-blue-700" id="post-pm">—</div><div class="calculation-detail text-sm" id="post-pm-detail"></div></div>
+                <div class="result-card"><div class="result-label">TM (календарных месяцев)</div><div class="text-xl font-semibold text-emerald-700" id="post-tm">—</div><div class="calculation-detail text-sm" id="post-tm-detail"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
