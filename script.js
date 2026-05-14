@@ -167,4 +167,117 @@
             container.appendChild(div);
         }
     }
+    
+    function getProduct(prefix) {
+        let prod = 1.0;
+        document.querySelectorAll(`select[id^="${prefix}"]`).forEach(s => prod *= parseFloat(s.value));
+        return prod;
+    }
+    
+    function getScaleSum(containerId) {
+        let sum = 0;
+        document.querySelectorAll(`#${containerId} select`).forEach(s => sum += parseFloat(s.value));
+        return sum;
+    }
+    
+    function recalcAll() {
+        const basicSize = document.getElementById('basic-size-value');
+        const basicUnit = document.getElementById('basic-size-unit');
+        const basicErr = document.getElementById('basic-size-error');
+        const basicHint = document.getElementById('basic-size-hint');
+        let ksloc = getKslocFromInputs(basicSize, basicUnit, basicErr, basicHint);
+        if (ksloc !== null) {
+            const type = document.getElementById('basic-type').value;
+            const coeff = BASIC_COCOMO[type];
+            const pm = coeff.a * Math.pow(ksloc, coeff.b);
+            const tm = coeff.c * Math.pow(pm, coeff.d);
+            document.getElementById('basic-pm-value').innerText = pm.toFixed(2);
+            document.getElementById('basic-tm-value').innerText = tm.toFixed(2);
+            document.getElementById('basic-pm-detail').innerHTML = `PM = ${coeff.a} × ${ksloc.toFixed(3)}^${coeff.b} = ${pm.toFixed(2)} чел-мес.`;
+            document.getElementById('basic-tm-detail').innerHTML = `TM = ${coeff.c} × ${pm.toFixed(2)}^${coeff.d} = ${tm.toFixed(2)} мес.`;
+        } else {
+            document.getElementById('basic-pm-value').innerText = '—';
+            document.getElementById('basic-tm-value').innerText = '—';
+            document.getElementById('basic-pm-detail').innerHTML = 'PM = a × (SIZE)^b (некорректный размер)';
+            document.getElementById('basic-tm-detail').innerHTML = 'TM = c × (PM)^d';
+        }
+        
+        const interSize = document.getElementById('inter-size-value');
+        const interUnit = document.getElementById('inter-size-unit');
+        const interErr = document.getElementById('inter-size-error');
+        const interHint = document.getElementById('inter-size-hint');
+        let iksloc = getKslocFromInputs(interSize, interUnit, interErr, interHint);
+        if (iksloc !== null) {
+            const type = document.getElementById('inter-type').value;
+            const coeff = INTERMEDIATE_COEFF[type];
+            const eaf = getProduct('inter_cd_');
+            const pm = eaf * coeff.a * Math.pow(iksloc, coeff.b);
+            const base = BASIC_COCOMO[type];
+            const tm = base.c * Math.pow(pm, base.d);
+            document.getElementById('inter-eaf').innerText = eaf.toFixed(3);
+            document.getElementById('inter-pm').innerText = pm.toFixed(2);
+            document.getElementById('inter-tm').innerText = tm.toFixed(2);
+            document.getElementById('inter-eaf-detail').innerHTML = `EAF = произведение 15 множителей = ${eaf.toFixed(3)}`;
+            document.getElementById('inter-pm-detail').innerHTML = `PM = ${eaf.toFixed(3)} × ${coeff.a} × ${iksloc.toFixed(3)}^${coeff.b} = ${pm.toFixed(2)} чел-мес.`;
+            document.getElementById('inter-tm-detail').innerHTML = `TM = ${base.c} × ${pm.toFixed(2)}^${base.d} = ${tm.toFixed(2)} мес.`;
+        } else {
+            document.getElementById('inter-eaf').innerText = '—';
+            document.getElementById('inter-pm').innerText = '—';
+            document.getElementById('inter-tm').innerText = '—';
+        }
+        
+        function calcCocomo2(panel, A, sizeId, scaleId, emPrefix) {
+            const sizeVal = parseFloat(document.getElementById(sizeId).value);
+            const errSpan = document.getElementById(`${panel}-size-error`);
+            const hintSpan = document.getElementById(`${panel}-size-hint`);
+            if (isNaN(sizeVal) || sizeVal <= 0) {
+                if(errSpan) { errSpan.innerText = '❌ Введите положительное число'; errSpan.classList.remove('hidden'); hintSpan.classList.add('hidden'); }
+                document.getElementById(`${panel}-exp`).innerText = '—';
+                document.getElementById(`${panel}-eaf`).innerText = '—';
+                document.getElementById(`${panel}-pm`).innerText = '—';
+                document.getElementById(`${panel}-tm`).innerText = '—';
+                return;
+            }
+            if (sizeVal > 100) {
+                if(errSpan) { errSpan.innerText = '❌ Максимум 100 KSLOC'; errSpan.classList.remove('hidden'); hintSpan.classList.add('hidden'); }
+                document.getElementById(`${panel}-exp`).innerText = '—';
+                document.getElementById(`${panel}-eaf`).innerText = '—';
+                document.getElementById(`${panel}-pm`).innerText = '—';
+                document.getElementById(`${panel}-tm`).innerText = '—';
+                return;
+            }
+            errSpan.classList.add('hidden');
+            hintSpan.classList.remove('hidden');
+            
+            let sumSF = getScaleSum(scaleId);
+            const E = COCOMO2_B + 0.01 * sumSF;
+            let eaf = getProduct(emPrefix);
+            let pm_ns = eaf * A * Math.pow(sizeVal, E);
+            
+            let sced = 1.0;
+            if (panel === 'early') {
+                let scedSel = document.querySelector('#early-effort-multipliers select[id*="SCED"]');
+                if (scedSel) sced = parseFloat(scedSel.value);
+            } else {
+                let scedSel = document.querySelector('#post-effort-multipliers select[id*="SCED"]');
+                if (scedSel) sced = parseFloat(scedSel.value);
+            }
+            const pm_final = pm_ns * sced;
+            const exponentTM = 0.28 + 0.2 * (E - COCOMO2_B);
+            const tm = 3.67 * Math.pow(pm_ns, exponentTM);
+            const tm_final = tm * sced;
+            
+            document.getElementById(`${panel}-exp`).innerText = E.toFixed(4);
+            document.getElementById(`${panel}-eaf`).innerText = eaf.toFixed(3);
+            document.getElementById(`${panel}-pm`).innerText = pm_final.toFixed(2);
+            document.getElementById(`${panel}-tm`).innerText = tm_final.toFixed(2);
+            document.getElementById(`${panel}-exp-detail`).innerHTML = `ΣSF = ${sumSF.toFixed(2)} → E = 0.91 + 0.01×${sumSF.toFixed(2)} = ${E.toFixed(4)}`;
+            document.getElementById(`${panel}-eaf-detail`).innerHTML = `EAF = произведение всех EM = ${eaf.toFixed(3)}`;
+            document.getElementById(`${panel}-pm-detail`).innerHTML = `PM_номин = ${eaf.toFixed(3)} × ${A} × ${sizeVal}^${E.toFixed(4)} = ${pm_ns.toFixed(2)} чел-мес.<br>С учётом SCED (${sced}) → PM = ${pm_final.toFixed(2)} чел-мес.`;
+            document.getElementById(`${panel}-tm-detail`).innerHTML = `TM = SCED × 3.67 × (PM_номин)^(0.28+0.2×(E-0.91)) = ${sced} × 3.67 × (${pm_ns.toFixed(2)})^${exponentTM.toFixed(4)} = ${tm_final.toFixed(2)} мес.`;
+        }
+        
+        calcCocomo2('early', COCOMO2_A_EARLY, 'early-size', 'early-scale-factors', 'early_em_');
+        calcCocomo2('post', COCOMO2_A_POST, 'post-size', 'post-scale-factors', 'post_em_');
+    }
 })();
