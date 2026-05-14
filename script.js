@@ -73,4 +73,98 @@
     const COCOMO2_B = 0.91;
     const COCOMO2_A_EARLY = 2.94;
     const COCOMO2_A_POST = 2.45;
+    
+    function getKslocFromInputs(sizeEl, unitEl, errorEl, hintEl) {
+        let raw = parseFloat(sizeEl.value);
+        if (isNaN(raw)) raw = 0;
+        const unit = unitEl ? unitEl.value : 'ksloc';
+        let ksloc = (unit === 'sloc') ? raw / 1000 : raw;
+        
+        errorEl.classList.add('hidden');
+        hintEl.classList.remove('hidden');
+        
+        if (ksloc <= 0) {
+            errorEl.innerText = '❌ Объем кода должен быть больше нуля';
+            errorEl.classList.remove('hidden');
+            hintEl.classList.add('hidden');
+            return null;
+        }
+        if (ksloc > 100) {
+            errorEl.innerText = '❌ Максимум 100 KSLOC (100 000 SLOC)';
+            errorEl.classList.remove('hidden');
+            hintEl.classList.add('hidden');
+            return null;
+        }
+        return ksloc;
+    }
+    
+    function buildSelect(options, values, defaultVal=1.0) {
+        const select = document.createElement('select');
+        select.className = "param-select text-sm";
+        for (let i = 0; i < options.length; i++) {
+            if (values[i] !== null && values[i] !== undefined) {
+                const opt = document.createElement('option');
+                opt.value = values[i];
+                opt.textContent = `${options[i]} (${values[i]})`;
+                if (Math.abs(values[i] - defaultVal) < 0.001) opt.selected = true;
+                select.appendChild(opt);
+            }
+        }
+        return select;
+    }
+    
+    function renderCostDrivers() {
+        const container = document.getElementById('inter-cost-drivers');
+        container.innerHTML = '';
+        for (const [name, data] of Object.entries(COST_DRIVERS)) {
+            const div = document.createElement('div'); div.className = 'factor-card';
+            const label = document.createElement('label'); label.innerText = name;
+            const select = buildSelect(data.levels, data.values, 1.0);
+            select.id = `inter_cd_${name.replace(/[^a-zA-Z]/g, '')}`;
+            select.addEventListener('change', recalcAll);
+            div.appendChild(label); div.appendChild(select);
+            container.appendChild(div);
+        }
+    }
+    
+    function renderScaleFactors(containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        for (const [name, values] of Object.entries(SCALE_FACTORS)) {
+            const div = document.createElement('div'); div.className = 'factor-card';
+            const label = document.createElement('label'); label.innerText = name;
+            const select = buildSelect(SCALE_LEVELS, values, 3.72);
+            select.addEventListener('change', recalcAll);
+            div.appendChild(label); div.appendChild(select);
+            container.appendChild(div);
+        }
+    }
+    
+    function renderEarlyMultipliers() {
+        const container = document.getElementById('early-effort-multipliers');
+        container.innerHTML = '';
+        for (const [name, values] of Object.entries(EARLY_MULTIPLIERS)) {
+            const div = document.createElement('div'); div.className = 'factor-card';
+            const label = document.createElement('label'); label.innerText = name;
+            const select = buildSelect(EM_LEVELS, values, 1.0);
+            select.id = `early_em_${name.substring(0,5)}`;
+            select.addEventListener('change', recalcAll);
+            div.appendChild(label); div.appendChild(select);
+            container.appendChild(div);
+        }
+    }
+    
+    function renderPostMultipliers() {
+        const container = document.getElementById('post-effort-multipliers');
+        container.innerHTML = '';
+        for (const [name, values] of Object.entries(POST_MULTIPLIERS)) {
+            const div = document.createElement('div'); div.className = 'factor-card';
+            const label = document.createElement('label'); label.innerText = name;
+            const select = buildSelect(POST_LEVELS, values, 1.0);
+            select.id = `post_em_${name.substring(0,5)}`;
+            select.addEventListener('change', recalcAll);
+            div.appendChild(label); div.appendChild(select);
+            container.appendChild(div);
+        }
+    }
 })();
