@@ -88,3 +88,40 @@ h1, h2, h3, .tab-btn, .param-label, .result-label {
     justify-content: space-between; 
     align-items: center;
 }
+
+hr { margin: 0.75rem 0; }
+
+.calculation-detail { 
+    background: #ffffff; 
+    padding: 0.6rem 0.75rem; 
+    border-radius: 0.5rem; 
+    font-size: 0.75rem; 
+    font-family: 'SF Mono', 'Menlo', monospace; 
+    color: #495057;
+    margin-top: 0.75rem;
+    border: 1px solid #e9ecef;
+    line-height: 1.4;
+}
+
+.size-input-group {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.size-input-group input {
+    flex: 2;
+    min-width: 0;
+}
+
+.size-input-group select {
+    flex: 1.4;
+    min-width: 130px;
+    width: auto;
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+}
