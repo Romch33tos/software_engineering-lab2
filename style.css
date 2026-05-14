@@ -52,3 +52,39 @@ h1, h2, h3, .tab-btn, .param-label, .result-label {
     color: #adb5bd;
     margin-top: 0.2rem;
 }
+
+.tab-active { 
+    background-color: #2563eb; 
+    color: white; 
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2); 
+}
+
+.tab-inactive { 
+    background-color: #f1f5f9; 
+    color: #1e293b; 
+}
+
+.param-select { 
+    background-color: white; 
+    border-radius: 0.5rem; 
+    border: 1px solid #ced4da; 
+    padding: 0.5rem 0.75rem; 
+    font-size: 0.85rem; 
+    width: 100%;
+}
+
+.param-select:focus {
+    border-color: #2563eb;
+    outline: none;
+    ring: 2px solid #93c5fd;
+}
+
+.param-label { 
+    font-weight: 500; 
+    font-size: 0.85rem; 
+    color: #1e293b; 
+    margin-bottom: 0.35rem; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
