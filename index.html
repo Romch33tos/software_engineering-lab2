@@ -65,6 +65,46 @@
             </div>
         </div>
     </div>
+
+    <div id="panel-intermediate" class="tab-panel hidden">
+        <div class="bg-white rounded-2xl shadow-lg p-5 md:p-6">
+            <h2 class="text-xl font-medium text-slate-800 mb-5">Промежуточная модель COCOMO</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="param-block">
+                    <label class="param-label">Объем кода (SIZE)</label>
+                    <div class="size-input-group">
+                        <input type="number" id="inter-size-value" value="25" class="border rounded-lg p-2 w-full">
+                        <select id="inter-size-unit" class="border rounded-lg bg-white p-2">
+                            <option value="ksloc">Тыс. строк (KSLOC)</option>
+                            <option value="sloc" selected>Строк кода (SLOC)</option>
+                        </select>
+                    </div>
+                    <div class="validation-row">
+                        <div id="inter-size-hint" class="hint-text">💡 Рекомендуемый диапазон: 2–100 KSLOC (2000–100000 SLOC)</div>
+                        <div id="inter-size-error" class="error-text hidden"></div>
+                    </div>
+                </div>
+                <div class="param-block">
+                    <label class="param-label">Тип проекта</label>
+                    <select id="inter-type" class="param-select">
+                        <option value="organic">Распространённый (organic)</option>
+                        <option value="semidetached">Полунезависимый (semidetached)</option>
+                        <option value="embedded">Встроенный (embedded)</option>
+                    </select>
+                </div>
+            </div>
+            <hr class="my-5">
+            <div>
+                <h3 class="font-medium text-slate-700 mb-3">Атрибуты стоимости (15 факторов)</h3>
+                <div id="inter-cost-drivers" class="drivers-scroll factors-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));"></div>
+            </div>
+            <div class="mt-6 grid md:grid-cols-3 gap-5">
+                <div class="result-card"><div class="result-label">EAF (произведение множителей)</div><div class="text-xl font-semibold text-indigo-700" id="inter-eaf">1.00</div><div class="calculation-detail text-sm mt-2" id="inter-eaf-detail"></div></div>
+                <div class="result-card"><div class="result-label">PM (человеко-месяцев)</div><div class="text-xl font-semibold text-blue-700" id="inter-pm">—</div><div class="calculation-detail text-sm mt-2" id="inter-pm-detail"></div></div>
+                <div class="result-card"><div class="result-label">TM (календарных месяцев)</div><div class="text-xl font-semibold text-emerald-700" id="inter-tm">—</div><div class="calculation-detail text-sm mt-2" id="inter-tm-detail"></div></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="script.js"></script>
