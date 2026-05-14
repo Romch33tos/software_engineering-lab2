@@ -25,3 +25,30 @@ h1, h2, h3, .tab-btn, .param-label, .result-label {
     font-weight: 500;
     display: inline-block;
 }
+
+.result-card { 
+    background: #f9fafb;
+    border-radius: 1rem; 
+    padding: 1.25rem;
+    border: 1px solid #e9ecef;
+}
+
+.result-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
+.result-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+}
+
+.result-sub {
+    font-size: 0.7rem;
+    color: #adb5bd;
+    margin-top: 0.2rem;
+}
