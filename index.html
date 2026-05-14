@@ -21,6 +21,50 @@
         <button data-tab="early" class="tab-btn px-5 py-2 rounded-full text-sm font-medium transition-all tab-inactive">COCOMO II (Предварительная оценка)</button>
         <button data-tab="post" class="tab-btn px-5 py-2 rounded-full text-sm font-medium transition-all tab-inactive">COCOMO II (Детальная оценка)</button>
     </div>
+
+    <div id="panel-basic" class="tab-panel">
+        <div class="bg-white rounded-2xl shadow-lg p-5 md:p-6 border border-slate-100">
+            <h2 class="text-xl font-medium text-slate-800 mb-5">Базовая модель COCOMO (Basic)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="param-block">
+                    <label class="param-label">Объем кода (SIZE)</label>
+                    <div class="size-input-group">
+                        <input type="number" id="basic-size-value" value="25" step="any" class="border border-slate-300 rounded-lg p-2 w-full">
+                        <select id="basic-size-unit" class="border rounded-lg bg-white p-2">
+                            <option value="ksloc">Тыс. строк (KSLOC)</option>
+                            <option value="sloc" selected>Строк кода (SLOC)</option>
+                        </select>
+                    </div>
+                    <div class="validation-row">
+                        <div id="basic-size-hint" class="hint-text">💡 Рекомендуемый диапазон: 2–100 KSLOC (2000–100000 SLOC)</div>
+                        <div id="basic-size-error" class="error-text hidden"></div>
+                    </div>
+                </div>
+                <div class="param-block">
+                    <label class="param-label">Тип проекта</label>
+                    <select id="basic-type" class="param-select">
+                        <option value="organic">Распространённый (organic)</option>
+                        <option value="semidetached">Полунезависимый (semidetached)</option>
+                        <option value="embedded">Встроенный (embedded)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="result-card">
+                    <div class="result-label">Трудоемкость (PM)</div>
+                    <div class="result-value text-blue-700" id="basic-pm-value">—</div>
+                    <div class="result-sub">человеко-месяцев</div>
+                    <div class="calculation-detail" id="basic-pm-detail">PM = a × (SIZE)^b</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Время разработки (TM)</div>
+                    <div class="result-value text-emerald-700" id="basic-tm-value">—</div>
+                    <div class="result-sub">календарных месяцев</div>
+                    <div class="calculation-detail" id="basic-tm-detail">TM = c × (PM)^d</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="script.js"></script>
