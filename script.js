@@ -280,4 +280,32 @@
         calcCocomo2('early', COCOMO2_A_EARLY, 'early-size', 'early-scale-factors', 'early_em_');
         calcCocomo2('post', COCOMO2_A_POST, 'post-size', 'post-scale-factors', 'post_em_');
     }
+    
+    function bindTabs() {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('tab-active');
+                    b.classList.add('tab-inactive');
+                });
+                btn.classList.add('tab-active');
+                btn.classList.remove('tab-inactive');
+                const tabId = btn.getAttribute('data-tab');
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+                document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+            });
+        });
+    }
+    
+    function init() {
+        bindTabs();
+        renderCostDrivers();
+        renderScaleFactors('early-scale-factors');
+        renderScaleFactors('post-scale-factors');
+        renderEarlyMultipliers();
+        renderPostMultipliers();
+        document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', recalcAll));
+        recalcAll();
+    }
+    init();
 })();
